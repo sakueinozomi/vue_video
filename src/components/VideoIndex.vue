@@ -19,7 +19,8 @@ export default {
   data() {
     return {
       msg: 'index',
-      videoItem: []
+      videoItem: [],
+      catchFavorite: this.$store.state.favorite
     }
   },
   created() {
@@ -31,7 +32,10 @@ export default {
         this.videoItem = video_array_all;
       })     
     })
-    
+    // test for vuex
+    // this.$store.commit('pushFavorite');
+    // console.log(this.$store.state.favorite)
+    // console.log(this.catchFavorite)
   },
 }
 </script>
