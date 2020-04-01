@@ -8,11 +8,18 @@
         <div class="video_title" v-text="item.snippet.title"></div>
         <div class="video_description" v-text="item.snippet.description"></div>
       </div>
-      
     </div>
     <div class="btn" v-on:click="clickTest('')">
       click to add store
     </div>
+    <paginate
+      :page-count="total_page"
+      :click-handler="clickPagination"
+      :initial-page ="'1'"
+      :prev-text="'Prev'"
+      :next-text="'Next'"
+      :container-class="'pagination'">
+    </paginate>
   </div>
 </template>
 
@@ -20,7 +27,9 @@
 import Vue from 'vue'
 import axios from 'axios'
 import VueAxios from 'vue-axios'
+import Paginate from 'vuejs-paginate'
 
+Vue.component('paginate', Paginate)
 Vue.use(VueAxios, axios)
 
 export default {
@@ -29,7 +38,8 @@ export default {
     return {
       msg: 'index',
       videoItem: [],
-      catchFavorite: this.$store.state.favorite
+      catchFavorite: this.$store.state.favorite,
+      total_page: 0
     }
   },
   created() {
@@ -39,9 +49,9 @@ export default {
         let video_array_2 = response.data.items;
         let video_array_all = video_array_1.concat(video_array_2);
         this.videoItem = video_array_all;
+        this.total_page = Math.ceil(video_array_all.length/12);
       })     
     })
-    // test for vuex
     // this.$store.commit('pushFavorite');
     // console.log(this.$store.state.favorite)
     // console.log(this.catchFavorite)
@@ -54,6 +64,9 @@ export default {
     },
     transferTimeFormat: function(str) {
       return str.replace(/PT|S/g, '').replace(/[A-Z]/g, ':');
+    },
+    clickPagination: function(p){
+      console.log(p)
     }
   }
 }
@@ -78,6 +91,7 @@ li {
 }
 a {
   color: #42b983;
+  outline: unset;
 }
 .video_container {
   margin: 0 auto;
@@ -133,6 +147,13 @@ a {
       }
     }
 
+  }
+}
+.pagination {
+  .active, .disabled {
+    a {
+      color: #000000;
+    }
   }
 }
 .btn {
