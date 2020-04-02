@@ -40,6 +40,16 @@ a {
                 right: 0;
                 bottom: 0;
             }
+            .video_favorite {
+                position: absolute;
+                color: #ffffff;
+                cursor: pointer;
+                right: 0.5em;
+                top: 0.25em;
+                .favorite_icon {
+                    color: #FFEE99;
+                }
+            }
         }
         .video_title {
             color: #000000;
@@ -71,12 +81,11 @@ a {
 
     }
 }
-
 .pagination {
     .active,
     .disabled {
         a {
-            color: #000000;
+            color: #555555;
         }
     }
 }
