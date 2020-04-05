@@ -44,8 +44,8 @@ export default {
   data() {
     return {
       msg: 'index',
-      videoItems: [],
       videoItemArray: [],
+      videoFavorite:[],
       catchFavorite: this.$store.state.favorite,
       page_num: 0,
       total_page: 0,
@@ -58,16 +58,18 @@ export default {
       Vue.axios.get('https://www.googleapis.com/youtube/v3/videos?pageToken=CAwQAA&part=snippet,contentDetails&chart=mostPopular&maxResults=13&key=AIzaSyBOdz5KQWjpP44XNJirEpIgYlKkkGisE98').then((response) => {
         let video_array_2 = response.data.items;
         let video_array_all = video_array_1.concat(video_array_2);
-        this.videoItems = video_array_all;
         this.videoItemArray = this.chunkArray(video_array_all, 12);
         this.total_page = Math.ceil(video_array_all.length/12);
       })     
     })
   },
+  destroyed() {
+    console.log('Destroyed!');
+  },
   methods: {
     clickTest: function(e) {
-      this.$store.commit('pushFavorite');
-      console.log(this.$store.state.favorite)
+      // this.$store.commit('pushFavorite');
+      // console.log(this.$store.state.favorite)
       console.log(e)
     },
     transferTimeFormat: function(str) {
@@ -80,6 +82,7 @@ export default {
       return Array.from({ length: Math.ceil(arr.length / size) }, (v, i) => arr.slice(i * size, i * size + size))
     },
     toggleFavorite: function(id){
+      let self = this // to solve use this can't call other method function
       this.videoItemArray[this.page_num].forEach(
         function(item) {
           if(item.id == id) {
@@ -88,8 +91,20 @@ export default {
             } else {
               Vue.set(item, 'favorite', true);
             }
+            self.checkItemInArray(item.id, self.videoFavorite)
           } 
-        })
+        }
+      )
+    },
+    checkItemInArray: function(item, arr){
+      if(arr.indexOf(item) > -1) {
+        arr.splice(arr.indexOf(item), 1)
+      } else {
+        arr.push(item)
+      }
+    },
+    checkArrayItemInObject: function(arr, obj){
+      console.log(arr, obj)
     }
   }
 }
