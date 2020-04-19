@@ -13,9 +13,6 @@
         <div class="video_description" v-text="item.snippet.description"></div>
       </div>
     </div>
-    <div class="btn" @click="clickTest('')">
-      click to add store
-    </div>
     <paginate
       :page-count="total_page"
       :click-handler="clickPagination"
@@ -53,24 +50,26 @@ export default {
     }
   },
   created() {
-    if (this.$store.state.allVideoItems == 0) {
-      Vue.axios.get('https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails&chart=mostPopular&maxResults=12&key=AIzaSyBOdz5KQWjpP44XNJirEpIgYlKkkGisE98').then((response) => {
+    console.log(this.$store.state.allVideoItemsWithPagination)
+    if (this.$store.state.allVideoItemsWithPagination.length == 0) {
+      Vue.axios.get('https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails&chart=mostPopular&maxResults=6&key=AIzaSyBOdz5KQWjpP44XNJirEpIgYlKkkGisE98').then((response) => {
         let video_array_1 = response.data.items; 
-        Vue.axios.get('https://www.googleapis.com/youtube/v3/videos?pageToken=CAwQAA&part=snippet,contentDetails&chart=mostPopular&maxResults=13&key=AIzaSyBOdz5KQWjpP44XNJirEpIgYlKkkGisE98').then((response) => {
+        Vue.axios.get('https://www.googleapis.com/youtube/v3/videos?pageToken=CAwQAA&part=snippet,contentDetails&chart=mostPopular&maxResults=7&key=AIzaSyBOdz5KQWjpP44XNJirEpIgYlKkkGisE98').then((response) => {
           let video_array_2 = response.data.items;
           let video_array_all = video_array_1.concat(video_array_2);
           this.videoItemArray = this.chunkArray(video_array_all, this.per_page_pagination);
-          this.$store.commit('getAllVideoItems', this.videoItemArray)
+          this.$store.commit('getAllVideoItemsPagination', this.videoItemArray)
+          this.$store.commit('getVideoItems', video_array_all)
           this.total_page = Math.ceil(video_array_all.length/this.per_page_pagination);
         })     
       })
     } else {
-      this.videoItemArray = this.$store.state.allVideoItems;
+      this.videoItemArray = this.$store.state.allVideoItemsWithPagination;
     }
     
   },
-  beforeDestroy() { 
-    this.$store.commit('getAllVideoItems', this.videoItemArray)
+  updated(){
+    this.$store.commit('getfavoriteItems',this.videoFavorite)
   },
   methods: {
     transferTimeFormat: function(str) {
@@ -93,7 +92,6 @@ export default {
               Vue.set(item, 'favorite', true);
             }
             self.checkItemInArray(item.id, self.videoFavorite);
-            console.log(self.videoFavorite)
           } 
         }
       )
@@ -105,9 +103,6 @@ export default {
         arr.push(item)
       }
     },
-    checkArrayItemInObject: function(arr, obj){
-      console.log(arr, obj)
-    }
   }
 }
 </script>
