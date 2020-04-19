@@ -46,32 +46,33 @@ export default {
       msg: 'index',
       videoItemArray: [],
       videoFavorite:[],
-      catchFavorite: this.$store.state.favorite,
       page_num: 0,
       total_page: 0,
+      per_page_pagination: 12,
       test: false
     }
   },
   created() {
-    Vue.axios.get('https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails&chart=mostPopular&maxResults=12&key=AIzaSyBOdz5KQWjpP44XNJirEpIgYlKkkGisE98').then((response) => {
-      let video_array_1 = response.data.items; 
-      Vue.axios.get('https://www.googleapis.com/youtube/v3/videos?pageToken=CAwQAA&part=snippet,contentDetails&chart=mostPopular&maxResults=13&key=AIzaSyBOdz5KQWjpP44XNJirEpIgYlKkkGisE98').then((response) => {
-        let video_array_2 = response.data.items;
-        let video_array_all = video_array_1.concat(video_array_2);
-        this.videoItemArray = this.chunkArray(video_array_all, 12);
-        this.total_page = Math.ceil(video_array_all.length/12);
-      })     
-    })
+    if (this.$store.state.allVideoItems == 0) {
+      Vue.axios.get('https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails&chart=mostPopular&maxResults=12&key=AIzaSyBOdz5KQWjpP44XNJirEpIgYlKkkGisE98').then((response) => {
+        let video_array_1 = response.data.items; 
+        Vue.axios.get('https://www.googleapis.com/youtube/v3/videos?pageToken=CAwQAA&part=snippet,contentDetails&chart=mostPopular&maxResults=13&key=AIzaSyBOdz5KQWjpP44XNJirEpIgYlKkkGisE98').then((response) => {
+          let video_array_2 = response.data.items;
+          let video_array_all = video_array_1.concat(video_array_2);
+          this.videoItemArray = this.chunkArray(video_array_all, this.per_page_pagination);
+          this.$store.commit('getAllVideoItems', this.videoItemArray)
+          this.total_page = Math.ceil(video_array_all.length/this.per_page_pagination);
+        })     
+      })
+    } else {
+      this.videoItemArray = this.$store.state.allVideoItems;
+    }
+    
   },
-  destroyed() {
-    console.log('Destroyed!');
+  beforeDestroy() { 
+    this.$store.commit('getAllVideoItems', this.videoItemArray)
   },
   methods: {
-    clickTest: function(e) {
-      // this.$store.commit('pushFavorite');
-      // console.log(this.$store.state.favorite)
-      console.log(e)
-    },
     transferTimeFormat: function(str) {
       return str.replace(/PT|S/g, '').replace(/[A-Z]/g, ':');
     },
@@ -91,7 +92,8 @@ export default {
             } else {
               Vue.set(item, 'favorite', true);
             }
-            self.checkItemInArray(item.id, self.videoFavorite)
+            self.checkItemInArray(item.id, self.videoFavorite);
+            console.log(self.videoFavorite)
           } 
         }
       )
@@ -110,5 +112,4 @@ export default {
 }
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style src="../assets/style.scss" lang="scss"></style>

@@ -7,11 +7,11 @@ Vue.use(Vuex, VueAxios, axios)
 
 export default new Vuex.Store({
   state: {
-    favorite: [],
+    allVideoItems:[]
   },
   mutations: {
-    pushFavorite(){
-      this.state.favorite.push('addPush')
+    getAllVideoItems(state, item){
+      state.allVideoItems = item;
     }
   },
   actions: {
