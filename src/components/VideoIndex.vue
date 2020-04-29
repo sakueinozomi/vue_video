@@ -52,19 +52,21 @@ export default {
   created() {
     console.log(this.$store.state.allVideoItemsWithPagination)
     if (this.$store.state.allVideoItemsWithPagination.length == 0) {
-      Vue.axios.get('https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails&chart=mostPopular&maxResults=6&key=AIzaSyBOdz5KQWjpP44XNJirEpIgYlKkkGisE98').then((response) => {
+      Vue.axios.get('https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails&chart=mostPopular&maxResults=12&key=AIzaSyBOdz5KQWjpP44XNJirEpIgYlKkkGisE98').then((response) => {
         let video_array_1 = response.data.items; 
-        Vue.axios.get('https://www.googleapis.com/youtube/v3/videos?pageToken=CAwQAA&part=snippet,contentDetails&chart=mostPopular&maxResults=7&key=AIzaSyBOdz5KQWjpP44XNJirEpIgYlKkkGisE98').then((response) => {
+        Vue.axios.get('https://www.googleapis.com/youtube/v3/videos?pageToken=CAwQAA&part=snippet,contentDetails&chart=mostPopular&maxResults=12&key=AIzaSyBOdz5KQWjpP44XNJirEpIgYlKkkGisE98').then((response) => {
           let video_array_2 = response.data.items;
           let video_array_all = video_array_1.concat(video_array_2);
           this.videoItemArray = this.chunkArray(video_array_all, this.per_page_pagination);
           this.$store.commit('getAllVideoItemsPagination', this.videoItemArray)
           this.$store.commit('getVideoItems', video_array_all)
-          this.total_page = Math.ceil(video_array_all.length/this.per_page_pagination);
+          this.countTotalPage(video_array_all);
         })     
       })
     } else {
       this.videoItemArray = this.$store.state.allVideoItemsWithPagination;
+      this.total_page = this.videoItemArray.length;
+      console.log(this.videoItemArray);
     }
     
   },
@@ -103,6 +105,9 @@ export default {
         arr.push(item)
       }
     },
+    countTotalPage: function(arr){
+      this.total_page = Math.ceil(arr.length/this.per_page_pagination);
+    }
   }
 }
 </script>

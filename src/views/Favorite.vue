@@ -1,6 +1,7 @@
 <template>
-  <div class="about">
+  <div class="container">
     <h1>{{ msg }}</h1>
+    
   </div>
   
 </template>
@@ -17,3 +18,4 @@ export default {
   },
 }
 </script>
+<style src="../assets/style.scss" lang="scss"></style>
